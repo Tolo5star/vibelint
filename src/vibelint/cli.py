@@ -28,7 +28,9 @@ def main() -> None:
               help="Exit 1 if any finding at this severity or above (overrides config)")
 @click.option("--config", "config_path", type=click.Path(), default=None,
               help="Path to .vibelint.yaml")
-def scan(target: str, fmt: str, fail_on: str | None, config_path: str | None) -> None:
+@click.option("--verbose", "-v", is_flag=True, default=False,
+              help="Expand all warnings (default: show collapsed summary table)")
+def scan(target: str, fmt: str, fail_on: str | None, config_path: str | None, verbose: bool) -> None:
     """Scan files for AI-generated code patterns."""
     target_path = Path(target).resolve()
     config = load_config(Path(config_path).parent if config_path else target_path)
@@ -44,7 +46,7 @@ def scan(target: str, fmt: str, fail_on: str | None, config_path: str | None) ->
     if fmt == "json":
         formatter = JsonFormatter(base_dir=base_dir)
     else:
-        formatter = TerminalFormatter(base_dir=base_dir)
+        formatter = TerminalFormatter(base_dir=base_dir, verbose=verbose)
 
     formatter.format(result)
 
